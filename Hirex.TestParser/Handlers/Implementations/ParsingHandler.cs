@@ -21,6 +21,8 @@ namespace Hirex.TestParser.Handlers.Implementations
 
             designersService.AddDesigner(new DesignerModel { Name = "DOKERcom", Link = "work.ua" });
 
+            //designersService.DeleteDesigner();
+
             string url = Console.ReadLine();
         }
 

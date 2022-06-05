@@ -10,9 +10,13 @@ namespace DataAccessLayer.Repositories.Interfaces
     {
         public Task AddDesigner(DesignerEntity designer);
 
-        public Task DeleteDesigner(DesignerEntity designer);
+        public Task DeleteDesigner(string link);
 
         public Task UpdateDesigner(DesignerEntity designer);
+
+        public Task<DesignerEntity> GetDesignerByLink(string link);
+
+        public Task DeleteAllDesignerWorks(string link);
 
     }
 }

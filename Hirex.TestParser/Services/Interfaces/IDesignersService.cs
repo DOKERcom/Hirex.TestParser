@@ -10,7 +10,7 @@ namespace Hirex.TestParser.Services.Interfaces
     {
         public Task AddDesigner(DesignerModel designer);
 
-        public Task DeleteDesigner(DesignerModel designer);
+        public Task DeleteDesigner(string link);
 
         public Task UpdateDesigner(DesignerModel designer);
     }

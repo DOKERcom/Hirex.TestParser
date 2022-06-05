@@ -1,4 +1,6 @@
-﻿using DataAccessLayer.Repositories.Interfaces;
+﻿using DataAccessLayer.Entities;
+using DataAccessLayer.Repositories.Interfaces;
+using Hirex.TestParser.BLL.Factories.Interfaces;
 using Hirex.TestParser.Factories.Interfaces;
 using Hirex.TestParser.Models;
 using Hirex.TestParser.Services.Interfaces;
@@ -15,13 +17,18 @@ namespace Hirex.TestParser.Services.Implementations
 
         IModelToEntityFactory modelToEntityFactory;
 
+        IEntityUpdateByModelFactory entityUpdateByModelFactory;
+
         public DesignersService(
+            IEntityUpdateByModelFactory entityUpdateByModelFactory,
             IDesignersRepository designersRepository, 
             IModelToEntityFactory modelToEntityFactory
+            
             )
         {
             this.designersRepository = designersRepository;
             this.modelToEntityFactory = modelToEntityFactory;
+            this.entityUpdateByModelFactory = entityUpdateByModelFactory;
         }
 
         public async Task AddDesigner(DesignerModel designer)
@@ -29,14 +36,19 @@ namespace Hirex.TestParser.Services.Implementations
             await designersRepository.AddDesigner(modelToEntityFactory.DesignerModelToEntity(designer));
         }
 
-        public async Task DeleteDesigner(DesignerModel designer)
+        public async Task DeleteDesigner(string link)
+
         {
-            await designersRepository.DeleteDesigner(modelToEntityFactory.DesignerModelToEntity(designer));
+            if (await designersRepository.GetDesignerByLink(link) != null)
+                await designersRepository.DeleteDesigner(link);
         }
 
         public async Task UpdateDesigner(DesignerModel designer)
         {
-            await designersRepository.UpdateDesigner(modelToEntityFactory.DesignerModelToEntity(designer));
+            DesignerEntity designerEntity = await designersRepository.GetDesignerByLink(designer.Link);
+
+            if (designerEntity != null)
+                await designersRepository.UpdateDesigner(entityUpdateByModelFactory.EntityUpdateByModel(designerEntity, designer));
         }
     }
 }
