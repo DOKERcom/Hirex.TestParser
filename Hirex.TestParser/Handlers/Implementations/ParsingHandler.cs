@@ -3,6 +3,7 @@ using Hirex.TestParser.Handlers.Interfaces;
 using Hirex.TestParser.Models;
 using Hirex.TestParser.Services.Interfaces;
 using HtmlAgilityPack;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -26,32 +27,37 @@ namespace Hirex.TestParser.Handlers.Implementations
         public async Task Parse()
         {
             Console.WriteLine("Hi, enter your url here:");
-            string link = "https://fonts.adobe.com/designers/";
 
-            string vff = await Download("https://fonts.adobe.com/designers/christian-schwartz/families?browse_mode=default&sort=alpha");
-
-            //string html = await Download(link);
-
-            //List<string> linkList = GetAllLinks(html, "//div[@class=\"spectrum-grid-row\"]/div/a/span/../..", "<a href=\"(.*?)\"", link);
-
-            //foreach (string linkn in linkList)
-            //{
-            //   await designersService.AddDesigner(await ParseInfoFromDesignerPage(linkn,"//h1[@class=\"spectrum-Heading--display\"]", new Regex("<a ng-href=.*\\s*<\\/a>"), new Regex("<h1 class=.*?>\\s*(.*)\\s*"), new Regex("fonts\\/(.*)"), new Regex("ng-href=\"(.*?)\"")));
-            //}
-
-            //designersService.AddWorkToDesignerById((await designersService.GetDesignerByLink("work.ua")).Id, (await worksService.GetWorkByLink("work.td")).Id).Wait();
-            //designersService.DeleteWorkFromDesignerById((await designersService.GetDesignerByLink("work.ua")).Id, (await worksService.GetWorkByLink("work.td")).Id).Wait();
-            Console.ReadLine();
+            await StartParsing(Console.ReadLine()); //https://fonts.adobe.com/designers/
         }
 
-        private async Task<string> Download(string link)
+        public async Task StartParsing(string link)
+        {
+            string html = await Download(link);
+
+            List<string> linkList = GetAllLinks(html, "//div[@class=\"spectrum-grid-row\"]/div/a/span/../..", "<a href=\"(.*?)\"", link);
+
+            foreach (string linkn in linkList)
+            {
+                await designersService.AddDesigner(await ParseInfoFromDesignerPage(linkn, "//h1[@class=\"spectrum-Heading--display\"]", new Regex("<a ng-href=.*\\s*<\\/a>"), new Regex("<h1 class=.*?>\\s*(.*)\\s*"), new Regex("fonts\\/(.*)"), new Regex("ng-href=\"(.*?)\"")));
+            }
+        }
+
+        private async Task<string> Download(string link, Dictionary<string, string> headers = null)
         {
             string html= "";
+
             using (var wc = new WebClient())
             {
-                wc.Headers. = "browse_mode=default&sort=alpha";
+                if(headers!= null && headers.Count>0)
+                    foreach (var header in headers)
+                    {
+                        wc.Headers.Add(header.Key, header.Value);
+                    }
+
                 html = await wc.DownloadStringTaskAsync(new Uri(link));
             }
+
             return html;
         }
 
@@ -87,32 +93,52 @@ namespace Hirex.TestParser.Handlers.Implementations
 
             HtmlNode nodeName = htmlDocument.DocumentNode.SelectSingleNode(nameXpath);
 
-            MatchCollection works = worksRegex.Matches(html);
-
             designer.Name = regexName.Match(nodeName.OuterHtml).Groups[1].Value;
 
             designer.Link = link;
 
-            if(works != null)
-                foreach (Match work in works)
-                {
-                    WorkModel workModel = new WorkModel();
-
-                    workModel.WorkLink = new Uri(new Uri(link), regexWorkLink.Match(work.Value).Groups[1].Value).ToString();
-
-                    workModel.WorkName = regexWorkName.Match(workModel.WorkLink).Groups[1].Value;
-
-                    designer.Works.Add(workModel);
-                }
+            designer = await GetWorks(designer, link);
 
             return designer;
         }
 
-        private async Task StartLinkParsing(List<string> listLinks)
+        private async Task<DesignerModel> GetWorks(DesignerModel designer, string designerLink)
         {
-            foreach (string link in listLinks)
+            string linkToGetWorks = designerLink + "/families?browse_mode=default&sort=alpha";
+            Dictionary<string, string> headers = new Dictionary<string, string>()
             {
-               string html = await Download(link);
+                { "accept", "application/json" },
+                { "referer", designerLink },
+                { "user-agent", "Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Mobile Safari/537.36"},
+
+            };
+
+            string result = await Download(linkToGetWorks, headers);
+            dynamic works = StringToJson(result);
+
+            if (works != null)
+                foreach (var work in works.families_data.families)
+                {
+                    WorkModel workModel = new WorkModel();
+
+                    workModel.WorkLink = (new Uri(new Uri(designerLink), "/fonts/"+work.slug)).ToString();
+
+                    workModel.WorkName = work.name;
+
+                    designer.Works.Add(workModel);
+                }
+            return designer;
+        }
+
+        private object StringToJson(string input)
+        {
+            try
+            {
+                return JsonConvert.DeserializeObject(input);
+            }
+            catch
+            {
+                return null;
             }
         }
     }
