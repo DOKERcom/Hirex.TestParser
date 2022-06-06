@@ -3,6 +3,8 @@ using DataAccessLayer.Repositories.Implementations;
 using DataAccessLayer.Repositories.Interfaces;
 using Hirex.TestParser.BLL.Factories.Implementations;
 using Hirex.TestParser.BLL.Factories.Interfaces;
+using Hirex.TestParser.BLL.Services.Implementations;
+using Hirex.TestParser.BLL.Services.Interfaces;
 using Hirex.TestParser.Factories.Implementations;
 using Hirex.TestParser.Factories.Interfaces;
 using Hirex.TestParser.Handlers.Implementations;
@@ -39,11 +41,9 @@ namespace Hirex.TestParser
             
 
             services.AddScoped<IDesignersService, DesignersService>();
+            services.AddScoped< IWorksService, WorksService>();
 
             services.AddScoped<IParsingHandler, ParsingHandler>();
-
-            
-
 
         }
     }
@@ -58,7 +58,7 @@ namespace Hirex.TestParser
 
         public void Execute()
         {
-            _parsingHandler.Parse();
+            _parsingHandler.Parse().Wait();
         }
     }
 }

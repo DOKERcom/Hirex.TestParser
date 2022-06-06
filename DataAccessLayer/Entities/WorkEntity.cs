@@ -12,8 +12,6 @@ namespace DataAccessLayer.Entities
         [Key]
         public int Id { get; set; }
 
-        public int DesignerId { get; set; }
-
         public string WorkName { get; set; }
 
         public string WorkLink { get; set; }

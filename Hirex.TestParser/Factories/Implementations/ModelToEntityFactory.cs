@@ -27,11 +27,17 @@ namespace Hirex.TestParser.Factories.Implementations
 
         public WorkEntity WorkModelToEntity(WorkModel workModel)
         {
+            List<DesignerEntity> designers = new List<DesignerEntity>();
+
+            if (workModel.Designers.Count > 0)
+                foreach (var desinger in workModel.Designers)
+                    designers.Add(DesignerModelToEntity(desinger));
+
             return new WorkEntity
             {
-                DesignerId = workModel.DesignerId,
                 WorkLink = workModel.WorkLink,
                 WorkName = workModel.WorkName,
+                Designers = designers,
             };
         }
     }

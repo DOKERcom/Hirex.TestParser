@@ -9,5 +9,7 @@ namespace Hirex.TestParser.BLL.Factories.Interfaces
     public interface IEntityUpdateByModelFactory
     {
         public DesignerEntity EntityUpdateByModel(DesignerEntity entity, DesignerModel model);
+
+        public WorkEntity EntityUpdateByModel(WorkEntity entity, WorkModel model);
     }
 }

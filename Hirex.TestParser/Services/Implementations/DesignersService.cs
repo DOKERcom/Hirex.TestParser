@@ -50,5 +50,25 @@ namespace Hirex.TestParser.Services.Implementations
             if (designerEntity != null)
                 await designersRepository.UpdateDesigner(entityUpdateByModelFactory.EntityUpdateByModel(designerEntity, designer));
         }
+
+        public async Task<DesignerEntity> GetDesignerByLink(string link)
+        {
+            return await designersRepository.GetDesignerByLink(link);
+        }
+
+        public async Task DeleteAllDesignerWorks(string link)
+        {
+            await designersRepository.DeleteAllDesignerWorks(link);
+        }
+
+        public async Task<int> AddWorkToDesignerById(int designerId, int workId)
+        {
+            return await designersRepository.AddWorkToDesignerById(designerId, workId);
+        }
+
+        public async Task<int> DeleteWorkFromDesignerById(int designerId, int workId)
+        {
+            return await designersRepository.DeleteWorkFromDesignerById(designerId, workId);
+        }
     }
 }

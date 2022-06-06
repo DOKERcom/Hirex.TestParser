@@ -1,8 +1,10 @@
 ﻿using DataAccessLayer.DbContexts;
 using DataAccessLayer.Entities;
 using DataAccessLayer.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,9 +23,9 @@ namespace DataAccessLayer.Repositories.Implementations
             await db.SaveChangesAsync();
         }
 
-        public async Task DeleteWork(WorkEntity work)
+        public async Task DeleteWork(string link)
         {
-            db.Works.Remove(work);
+            db.Works.Remove(await db.Works.Where(d => d.WorkLink == link).FirstOrDefaultAsync());
             await db.SaveChangesAsync();
         }
 
@@ -31,6 +33,16 @@ namespace DataAccessLayer.Repositories.Implementations
         {
             db.Works.Update(work);
             await db.SaveChangesAsync();
+        }
+
+        public async Task<WorkEntity> GetWorkByLink(string workLink)
+        {
+            return await db.Works.Where(d => d.WorkLink == workLink).FirstOrDefaultAsync();
+        }
+
+        public async Task<WorkEntity> GetWorkById(int workId)
+        {
+            return await db.Works.Where(d => d.Id == workId).FirstOrDefaultAsync();
         }
     }
 }

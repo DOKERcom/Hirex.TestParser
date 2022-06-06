@@ -6,8 +6,6 @@ namespace Hirex.TestParser.Models
 {
     public class WorkModel
     {
-        public int DesignerId { get; set; }
-
         public string WorkName { get; set; }
 
         public string WorkLink { get; set; }

@@ -18,5 +18,9 @@ namespace DataAccessLayer.Repositories.Interfaces
 
         public Task DeleteAllDesignerWorks(string link);
 
+        public Task<int> AddWorkToDesignerById(int designerId, int workId);
+
+        public Task<int> DeleteWorkFromDesignerById(int designerId, int workId);
+
     }
 }

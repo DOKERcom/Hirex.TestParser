@@ -14,5 +14,11 @@ namespace Hirex.TestParser.BLL.Factories.Implementations
             return new DesignerEntity();
             //TODO Factory Entity+Model
         }
+
+        public WorkEntity EntityUpdateByModel(WorkEntity entity, WorkModel model)
+        {
+            return new WorkEntity();
+            //TODO Factory Entity+Model
+        }
     }
 }
