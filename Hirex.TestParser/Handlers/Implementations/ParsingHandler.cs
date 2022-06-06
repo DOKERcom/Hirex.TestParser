@@ -31,7 +31,7 @@ namespace Hirex.TestParser.Handlers.Implementations
             await StartParsing(Console.ReadLine()); //https://fonts.adobe.com/designers/
         }
 
-        public async Task StartParsing(string link)
+        private async Task StartParsing(string link)
         {
             string html = await Download(link);
 
@@ -39,7 +39,9 @@ namespace Hirex.TestParser.Handlers.Implementations
 
             foreach (string linkn in linkList)
             {
-                await designersService.AddDesigner(await ParseInfoFromDesignerPage(linkn, "//h1[@class=\"spectrum-Heading--display\"]", new Regex("<a ng-href=.*\\s*<\\/a>"), new Regex("<h1 class=.*?>\\s*(.*)\\s*"), new Regex("fonts\\/(.*)"), new Regex("ng-href=\"(.*?)\"")));
+                DesignerModel designer = await ParseInfoFromDesignerPage(linkn, "//h1[@class=\"spectrum-Heading--display\"]", new Regex("<a ng-href=.*\\s*<\\/a>"), new Regex("<h1 class=.*?>\\s*(.*)\\s*"), new Regex("fonts\\/(.*)"), new Regex("ng-href=\"(.*?)\""));
+                await designersService.AddDesigner(designer);
+                Console.WriteLine($"The designer ({designer.Name}) has been added to database with him works");
             }
         }
 
@@ -78,11 +80,15 @@ namespace Hirex.TestParser.Handlers.Implementations
                 }
             }
 
+            Console.WriteLine($"All ({links.Count}) designer urls have been received.");
+
             return links;
         }
 
         private async Task<DesignerModel> ParseInfoFromDesignerPage(string link, string nameXpath, Regex worksRegex, Regex regexName, Regex regexWorkLink, Regex regexWorkName)
         {
+            Console.WriteLine($"Download the information at the link:{link}");
+
             DesignerModel designer = new DesignerModel(); 
 
             string html = await Download(link);
