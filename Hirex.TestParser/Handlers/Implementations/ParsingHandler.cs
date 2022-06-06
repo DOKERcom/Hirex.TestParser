@@ -26,13 +26,20 @@ namespace Hirex.TestParser.Handlers.Implementations
 
         public async Task Parse()
         {
-            Console.WriteLine("Hi, enter your url here:");
+            Console.WriteLine("Hi, enter your url here: (or just press \"Enter\", we use deafult link)");
 
-            await StartParsing(Console.ReadLine()); //https://fonts.adobe.com/designers/
+            string url = Console.ReadLine();  //https://fonts.adobe.com/designers/
+
+            if (!string.IsNullOrEmpty(url))
+                await StartParsing(url);
+            else
+                await StartParsing("https://fonts.adobe.com/designers/");
         }
 
         private async Task StartParsing(string link)
         {
+            Console.WriteLine($"Parsing proccess started by link: {link}");
+
             string html = await Download(link);
 
             List<string> linkList = GetAllLinks(html, "//div[@class=\"spectrum-grid-row\"]/div/a/span/../..", "<a href=\"(.*?)\"", link);
