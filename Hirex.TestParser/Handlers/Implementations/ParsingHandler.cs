@@ -50,6 +50,9 @@ namespace Hirex.TestParser.Handlers.Implementations
                 await designersService.AddDesigner(designer);
                 Console.WriteLine($"The designer ({designer.Name}) has been added to database with him works");
             }
+
+            Console.WriteLine($"Parsing proccess finished by link: {link}");
+            Console.ReadLine();
         }
 
         private async Task<string> Download(string link, Dictionary<string, string> headers = null)
